@@ -49,6 +49,23 @@ async function run() {
       }
     });
 
+    app.put("/tasks/drag/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { category, order } = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = { $set: { category, order } };
+        const result = await taskCollection.updateOne(filter, updateDoc);
+        if (result.modifiedCount === 0) {
+          return res.status(404).json({ error: "Task not found" });
+        }
+        const updatedTask = await taskCollection.findOne(filter);
+        res.json(updatedTask);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to update task order" });
+      }
+    });
+
     
   } catch (error) {
     console.error("MongoDB connection error:", error);
