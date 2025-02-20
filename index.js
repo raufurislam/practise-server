@@ -25,13 +25,15 @@ async function run() {
     const database = client.db("taskify");
     const taskCollection = database.collection("tasks");
 
-    app.get("/tasks", async (req, res) => {
+    app.get("/tasks/:email", async (req, res) => {
+      const { email } = req.params;
+
       try {
-        const todo = await taskCollection.find({ category: "todo" }).toArray();
+        const todo = await taskCollection.find({ category: "todo", userEmail: email }).toArray();
         const inProgress = await taskCollection
-          .find({ category: "inProgress" })
+          .find({ category: "inProgress", userEmail: email })
           .toArray();
-        const done = await taskCollection.find({ category: "done" }).toArray();
+        const done = await taskCollection.find({ category: "done", userEmail: email }).toArray();
         res.json({ todo, inProgress, done });
       } catch (error) {
         res.status(500).json({ error: "Failed to fetch tasks" });
