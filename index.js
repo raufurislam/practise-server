@@ -66,7 +66,23 @@ async function run() {
       }
     });
 
-    
+    app.delete("/tasks/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ error: "Invalid ObjectId" });
+        }
+        const result = await taskCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ error: "Task not found" });
+        }
+        res.json({ message: "Task deleted" });
+      } catch (error) {
+        res.status(500).json({ error: "Failed to delete task" });
+      }
+    });
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
