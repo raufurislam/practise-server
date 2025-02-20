@@ -38,6 +38,17 @@ async function run() {
       }
     });
 
+    app.post("/tasks", async (req, res) => {
+      try {
+        const task = req.body;
+        const result = await taskCollection.insertOne(task);
+        const newTask = { _id: result.insertedId, ...task };
+        res.status(201).json(newTask);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to add task" });
+      }
+    });
+
     
   } catch (error) {
     console.error("MongoDB connection error:", error);
